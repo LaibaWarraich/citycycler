@@ -1,23 +1,59 @@
-import { MapContainer, TileLayer, Polyline, Marker, Popup } from "react-leaflet";
+// frontend/src/components/MapView.jsx
+import {
+  MapContainer,
+  TileLayer,
+  Polyline,
+  Marker,
+  Popup,
+  useMapEvents,
+} from "react-leaflet";
 
-export default function MapView({ routeCoords }) {
+const startIcon = L.icon({
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  shadowSize: [41, 41],
+  shadowAnchor: [12, 41],
+});
+
+// Grüner Marker (Ende)
+const endIcon = L.icon({
+  iconUrl:
+    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  shadowSize: [41, 41],
+  shadowAnchor: [12, 41],
+});
+
+function ClickHandler({ onMapClick }) {
+  useMapEvents({
+    click(e) {
+      if (onMapClick) {
+        onMapClick([e.latlng.lat, e.latlng.lng]); // [lat, lng]
+      }
+    },
+  });
+  return null;
+}
+
+export default function MapView({ routeCoords, startPoint, endPoint, onMapClick }) {
   const viennaCenter = [48.2082, 16.3738];
-  const hasRoute = Array.isArray(routeCoords) && routeCoords.length > 0;
-  
-  let startLatLng = null;
-  let endLatLng = null;
-
-  if (hasRoute) {
-    const first = routeCoords[0];                          // [lon, lat]
-    const last = routeCoords[routeCoords.length - 1];      // [lon, lat]
-
-    startLatLng = [first[1], first[0]];  // [lat, lon]
-    endLatLng = [last[1], last[0]];      // [lat, lon]
-  }
 
   return (
-    <div style={{ width: "100%", height: "70vh", borderRadius: "12px", overflow: "hidden" }}>
-            <MapContainer
+    <div
+      style={{
+        width: "100%",
+        height: "60vh",
+        borderRadius: "12px",
+        overflow: "hidden",
+      }}
+    >
+      <MapContainer
         center={viennaCenter}
         zoom={13}
         scrollWheelZoom={true}
@@ -28,21 +64,29 @@ export default function MapView({ routeCoords }) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {hasRoute && (
-          <>
-            <Polyline
-              positions={routeCoords.map(c => [c[1], c[0]])}
-              pathOptions={{ color: "blue", weight: 4 }}
-            />
+        {/* Klick-Handler für Start/Ziel */}
+        <ClickHandler onMapClick={onMapClick} />
 
-            <Marker position={startLatLng}>
-              <Popup>Start</Popup>
-            </Marker>
+        {/* Marker für Startpunkt */}
+        {startPoint && (
+          <Marker position={startPoint} icon={startIcon}>
+            <Popup>Start</Popup>
+          </Marker>
+        )}
 
-            <Marker position={endLatLng}>
-              <Popup>Ziel</Popup>
-            </Marker>
-          </>
+        {/* Marker für Endpunkt */}
+        {endPoint && (
+          <Marker position={endPoint} icon={endIcon}>
+            <Popup>Ziel</Popup>
+          </Marker>
+        )}
+
+        {/* Route */}
+        {Array.isArray(routeCoords) && routeCoords.length > 0 && (
+          <Polyline
+            positions={routeCoords.map((c) => [c[1], c[0]])}
+            pathOptions={{ color: "blue", weight: 4 }}
+          />
         )}
       </MapContainer>
     </div>
