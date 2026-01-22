@@ -13,7 +13,17 @@ const defaultProgress = {
     active: 0,
   },
   roundTrips: 0,          // wie viele Rundtouren
-  lastRideAt: null,       // ISO-String
+  lastRideAt: null,  
+  
+  // Gespeicherte Fahrten
+  rides: [],
+
+  // Feedback-Zähler
+  feedbackStats: {
+    tooEasy: 0,
+    ok: 0,
+    tooHard: 0,
+  },// ISO-String
 };
 
 // Hilfsfunktion: Progress laden
@@ -44,8 +54,20 @@ function saveProgress(progress) {
 
 // Wird aufgerufen, wenn der User eine Route als abgeschlossen markiert
 // distance/ascent in Metern, mood = "relaxed" | "neutral" | "active", roundTrip = bool
-export function registerCompletedRide({ distance = 0, ascent = 0, mood, roundTrip }) {
+export function registerCompletedRide({ distance = 0, ascent = 0, mood, roundTrip, path = null, difficulty = null }) {
   const prev = loadProgress();
+
+  const ride = {
+    id: crypto?.randomUUID?.() || String(Date.now()),
+    at: new Date().toISOString(),
+    distance,
+    ascent,
+    mood,
+    roundTrip,
+    feedback: null, // wird später gesetzt
+    path,
+    difficulty: difficulty || null,
+  };
 
   const next = {
     ...prev,
@@ -53,18 +75,41 @@ export function registerCompletedRide({ distance = 0, ascent = 0, mood, roundTri
     totalDistance: prev.totalDistance + (distance || 0),
     totalAscent: prev.totalAscent + (ascent || 0),
     roundTrips: prev.roundTrips + (roundTrip ? 1 : 0),
-    lastRideAt: new Date().toISOString(),
+    lastRideAt: ride.at,
+
+    rides: [ride, ...(prev.rides || [])].slice(0, 200),
+
     moods: {
       ...prev.moods,
-      ...(mood
-        ? { [mood]: (prev.moods?.[mood] || 0) + 1 }
-        : {}),
+      ...(mood ? { [mood]: (prev.moods?.[mood] || 0) + 1 } : {}),
+    },
+
+    feedbackStats: {
+      ...(prev.feedbackStats || { tooEasy: 0, ok: 0, tooHard: 0 }),
     },
   };
 
   saveProgress(next);
   return next;
 }
+
+export function getWeeklySummary(progress) {
+  const now = new Date();
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+  const rides = (progress.rides || []).filter((r) => new Date(r.at) >= weekAgo);
+
+  const totalDistance = rides.reduce((s, r) => s + (r.distance || 0), 0);
+  const totalAscent = rides.reduce((s, r) => s + (r.ascent || 0), 0);
+
+  return {
+    count: rides.length,
+    distanceKm: totalDistance / 1000,
+    ascentM: totalAscent,
+  };
+}
+
+
 
 // Definition aller Badges + Bedingungen
 const BADGES = [
@@ -120,4 +165,26 @@ export function listAllBadges(progress) {
     ...badge,
     achieved: badge.check(progress),
   }));
+}
+
+export function setRideFeedback(rideId, feedback) {
+  const prev = loadProgress();
+
+  const rides = (prev.rides || []).map((r) =>
+    r.id === rideId ? { ...r, feedback } : r
+  );
+
+  const feedbackStats = { tooEasy: 0, ok: 0, tooHard: 0 };
+  for (const r of rides) {
+    if (r.feedback) feedbackStats[r.feedback]++;
+  }
+
+  const next = {
+    ...prev,
+    rides,
+    feedbackStats,
+  };
+
+  saveProgress(next);
+  return next;
 }

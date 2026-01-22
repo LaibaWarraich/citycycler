@@ -1,16 +1,17 @@
+// frontend/src/pages/MapPage.styles.js
 const styles = {
   pageBackground: {
     width: "100vw",
     minHeight: "100vh",
-    background: "#edf1f7",
+    background: "var(--cc-bg)",
     padding: "24px",
     boxSizing: "border-box",
   },
   card: {
-    maxWidth: "1200px",
+    maxWidth: "1600px",
     margin: "0 auto",
-    background: "#ffffff",
-    borderRadius: "16px",
+    background: "var(--cc-card)",
+    borderRadius: "18px",
     boxShadow: "0 18px 40px rgba(15, 23, 42, 0.08)",
     padding: "20px 24px 24px",
     boxSizing: "border-box",
@@ -45,13 +46,39 @@ const styles = {
     margin: 0,
     fontSize: "1.4rem",
     fontWeight: 600,
-    color: "#111827",
+    color: "var(--cc-text)",
     textAlign: "center",
   },
 
+  // NEU: Top-Layout (links Buttons, rechts Suchleisten)
+  topPanel: {
+    display: "grid",
+    gridTemplateColumns: "1fr 520px",
+    gap: "18px",
+    alignItems: "start",
+    marginTop: "8px",
+    marginBottom: "25px",
+  },
+  leftTop: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: "10px",
+  },
+  rightTop: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "stretch",
+    gap: "10px",
+  },
+
+  // Mood: links ausrichten
   moodRow: {
-    marginTop: 4,
-    marginBottom: 10,
+    marginTop: 0,
+    marginBottom: 0,
+    display: "flex",
+    justifyContent: "flex-start",
+    gap: 12,
   },
 
   // Rundtour-Toggle
@@ -94,27 +121,28 @@ const styles = {
     background: "#2563eb",
   },
 
-  // Steuerung & Adressen
+  // Steuerung (links unter Mood)
   controlsRow: {
     display: "flex",
-    gap: "10px",
-    marginBottom: "12px",
+    justifyContent: "flex-start",
+    gap: "12px",
     flexWrap: "wrap",
   },
-  addressRow: {
+
+  // Adressen rechts untereinander
+  addressStack: {
     display: "flex",
-    gap: "12px",
-    marginBottom: "12px",
-    flexWrap: "wrap",
+    flexDirection: "column",
+    gap: "10px",
   },
   addressColumn: {
-    flex: 1,
-    minWidth: "260px",
+    width: "100%",
   },
   addressInputRow: {
     display: "flex",
     gap: "6px",
     marginTop: "4px",
+    flexWrap: "nowrap",
   },
   label: {
     fontSize: "0.9rem",
@@ -128,13 +156,13 @@ const styles = {
     fontSize: "0.9rem",
     outline: "none",
   },
+
   primaryButton: {
     padding: "10px 22px",
     background: "#2563eb",
     color: "white",
     borderRadius: 999,
     border: "none",
-    marginBottom: "10px",
     fontWeight: 600,
     fontSize: "0.95rem",
   },
@@ -164,12 +192,21 @@ const styles = {
     fontWeight: 500,
   },
 
+  // Rundtour + Route generieren (links)
+  routeButtonsRow: {
+    display: "flex",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    gap: "12px",
+    flexWrap: "wrap",
+  },
+
   // Layout: Karte + Sidebar
   mainContent: {
     display: "grid",
     gridTemplateColumns: "minmax(0, 3fr) minmax(260px, 1.3fr)",
     gap: "18px",
-    marginTop: "10px",
+    marginTop: "24px",
   },
   mapColumn: {
     minWidth: 0,
@@ -218,6 +255,10 @@ const styles = {
     borderRadius: 14,
     background: "#fffbeb",
     border: "1px solid #facc15",
+    flexGrow: 1,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "flex-start",
   },
   badgeTitle: {
     fontSize: "1rem",
@@ -250,6 +291,32 @@ const styles = {
     fontSize: "0.8rem",
     color: "#92400e",
   },
+
+  badgeHeaderRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 6,
+  },
+  badgeLink: {
+    fontSize: "0.8rem",
+    color: "#2563eb",
+    textDecoration: "none",
+    fontWeight: 500,
+  },
+
+  headerActionButton: {
+    padding: "6px 12px",
+    borderRadius: 999,
+    border: "1px solid #dbeafe",
+    background: "#eff6ff",
+    color: "#1d4ed8",
+    fontSize: "0.9rem",
+    fontWeight: 600,
+    cursor: "pointer",
+    justifySelf: "end",
+  },
 };
 
 export default styles;
+

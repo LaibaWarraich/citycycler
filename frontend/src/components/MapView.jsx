@@ -5,8 +5,10 @@ import {
   Polyline,
   Marker,
   Popup,
-  useMapEvents,
+  useMapEvents
 } from "react-leaflet";
+import { useEffect } from "react";
+import { useMap } from "react-leaflet";
 
 const startIcon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -41,8 +43,26 @@ function ClickHandler({ onMapClick }) {
   return null;
 }
 
-export default function MapView({ routeCoords, startPoint, endPoint, onMapClick }) {
+function FitRoute({ routeCoords }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!Array.isArray(routeCoords) || routeCoords.length < 2) return;
+
+    const latlngs = routeCoords.map((c) => [c[1], c[0]]);
+    map.fitBounds(latlngs, { padding: [30, 30] });
+  }, [map, routeCoords]);
+
+  return null;
+}
+
+export default function MapView({ routeCoords, startPoint, endPoint, onMapClick, mood }) {
   const viennaCenter = [48.2082, 16.3738];
+  const routeColor =
+      mood === "active" ? "#ef4444" :   // rot
+      mood === "neutral" ? "#f59e0b" :  // orange
+      "#22c55e";                        // grün (relaxed/default)
+
 
   return (
     <div
@@ -85,9 +105,13 @@ export default function MapView({ routeCoords, startPoint, endPoint, onMapClick 
         {Array.isArray(routeCoords) && routeCoords.length > 0 && (
           <Polyline
             positions={routeCoords.map((c) => [c[1], c[0]])}
-            pathOptions={{ color: "blue", weight: 4 }}
+            pathOptions={{ color: routeColor, weight: 4 }}
           />
         )}
+        {/* Zoom auf gespeicherte Route */}
+        {Array.isArray(routeCoords) && routeCoords.length > 1 && (
+        <FitRoute routeCoords={routeCoords} />
+      )}
       </MapContainer>
     </div>
   );

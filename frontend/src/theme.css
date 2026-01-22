@@ -1,0 +1,17 @@
+:root {
+  --cc-bg: #edf1f7;
+  --cc-card: #ffffff;
+  --cc-text: #111827;
+  --cc-muted: #4b5563;
+  --cc-border: #e5e7eb;
+  --cc-soft: #f9fafb;
+}
+
+[data-theme="dark"] {
+  --cc-bg: #0b1220;
+  --cc-card: #0f172a;
+  --cc-text: #e5e7eb;
+  --cc-muted: #a1a1aa;
+  --cc-border: #243045;
+  --cc-soft: #111c33;
+}
